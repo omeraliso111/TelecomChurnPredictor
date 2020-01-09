@@ -1,0 +1,208 @@
+<html>
+<body></body>
+<script src="jquery-3.4.1.min.js"></script>
+<script src="tf.min.js"></script>
+<script>
+	var prediction = null;
+	function MaxMinScaler(max, min, value){
+		return ((value - min)/(max - min));
+	}
+	async function loadModel(){
+		var model = await tf.loadLayersModel("weights_js/model.json");
+		prediction = model.predict(tf.tensor([values]));
+		console.log("Prediction: " + prediction.dataSync()[0]);
+		if(prediction.dataSync()[0] > 0.5){
+			console.log("Churn Likely");
+		}else{
+			console.log("Churn Unlikely");
+		}
+	}
+
+	var columns = ["gender", "SeniorCitizen", "Partner", "Dependents", "tenure", "PhoneService", "PaperlessBilling", "MonthlyCharges", "TotalCharges", "InternetService_DSL", "InternetService_Fiber optic", "InternetService_No", "OnlineSecurity_No", "OnlineSecurity_No internet service", "OnlineSecurity_Yes", "OnlineBackup_No", "OnlineBackup_No internet service", "OnlineBackup_Yes", "DeviceProtection_No", "DeviceProtection_No internet service", "DeviceProtection_Yes", "TechSupport_No", "TechSupport_No internet service", "TechSupport_Yes", "StreamingTV_No", "StreamingTV_No internet service", "StreamingTV_Yes", "StreamingMovies_No", "StreamingMovies_No internet service", "StreamingMovies_Yes", "Contract_Month-to-month", "Contract_One year", "Contract_Two year", "PaymentMethod_Bank transfer (automatic)", "PaymentMethod_Credit card (automatic)", "PaymentMethod_Electronic check", "PaymentMethod_Mailed check", "MultipleLines_No", "MultipleLines_No phone service", "MultipleLines_Yes"];
+
+	var values = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
+
+	$(document).ready(function(){
+		$("#InternetService").on("change", function(){
+			var NoInternetService = $("#InternetService").val() == "No";
+			$("#OnlineSecurity").prop("disabled", NoInternetService);
+			$("#OnlineBackup").prop("disabled", NoInternetService);
+			$("#DeviceProtection").prop("disabled", NoInternetService);
+			$("#TechSupport").prop("disabled", NoInternetService);
+			$("#StreamingTV").prop("disabled", NoInternetService);
+			$("#StreamingMovies").prop("disabled", NoInternetService);
+		});
+	
+		$("#PhoneService").on("change", function(){
+			var NoPhoneService = !$("#PhoneService").prop("checked");
+			$("#MultipleLines").prop("disabled", NoPhoneService);
+		});
+
+		$("#PhoneService").trigger("change");
+		$("#InternetService").trigger("change");
+
+		$("#Submit").on("click", function(){
+			values[columns.indexOf("gender")] = Number($("#gender").val());
+			values[columns.indexOf("SeniorCitizen")] = Number($("#SeniorCitizen").prop("checked"));
+			values[columns.indexOf("Partner")] = Number($("#Partner").prop("checked"));
+			values[columns.indexOf("Dependents")] = Number($("#Dependents").prop("checked"));
+			values[columns.indexOf("PhoneService")] = Number($("#PhoneService").prop("checked"));
+			values[columns.indexOf("PaperlessBilling")] = Number($("#PaperlessBilling").prop("checked"));
+			values[columns.indexOf("MonthlyCharges")] = MaxMinScaler(118.75, 18.25, Number($("#MonthlyCharges").val()));
+			values[columns.indexOf("TotalCharges")] = MaxMinScaler(8684.8, 18.8, Number($("#TotalCharges").val()));
+			values[columns.indexOf("tenure")] = MaxMinScaler(72, 1, Number($("#tenure").val()));
+
+			if($("#InternetService").val() != "No"){
+				values[columns.indexOf("InternetService_DSL")] = Number($("#InternetService").val() == "DSL");
+				values[columns.indexOf("InternetService_Fiber optic")] = Number($("#InternetService").val() == "Fiber optic");
+				values[columns.indexOf("InternetService_No")] = 0;
+				values[columns.indexOf("OnlineSecurity_No")] = Number(!$("#OnlineSecurity").prop("checked"));
+				values[columns.indexOf("OnlineSecurity_Yes")] = Number($("#OnlineSecurity").prop("checked"));
+				values[columns.indexOf("OnlineSecurity_No internet service")] = 0;
+				values[columns.indexOf("OnlineBackup_No")] = Number(!$("#OnlineBackup").prop("checked"));
+				values[columns.indexOf("OnlineBackup_Yes")] = Number($("#OnlineBackup").prop("checked"));
+				values[columns.indexOf("OnlineBackup_No internet service")] = 0;
+				values[columns.indexOf("DeviceProtection_No")] = Number(!$("#DeviceProtection").prop("checked"));
+				values[columns.indexOf("DeviceProtection_Yes")] = Number($("#DeviceProtection").prop("checked"));
+				values[columns.indexOf("DeviceProtection_No internet service")] = 0;
+				values[columns.indexOf("TechSupport_No")] = Number(!$("#TechSupport").prop("checked"));
+				values[columns.indexOf("TechSupport_Yes")] = Number($("#TechSupport").prop("checked"));
+				values[columns.indexOf("TechSupport_No internet service")] = 0;
+				values[columns.indexOf("StreamingMovies_No")] = Number(!$("#StreamingMovies").prop("checked"));
+				values[columns.indexOf("StreamingMovies_Yes")] = Number($("#StreamingMovies").prop("checked"));
+				values[columns.indexOf("StreamingMovies_No internet service")] = 0;
+				values[columns.indexOf("StreamingTV_No")] = Number(!$("#StreamingTV").prop("checked"));
+				values[columns.indexOf("StreamingTV_Yes")] = Number($("#StreamingTV").prop("checked"));
+				values[columns.indexOf("StreamingTV_No internet service")] = 0;
+			}else{
+				values[columns.indexOf("InternetService_DSL")] = 0;
+				values[columns.indexOf("InternetService_Fiber optic")] = 0;
+				values[columns.indexOf("InternetService_No")] = 1;
+				values[columns.indexOf("OnlineSecurity_No")] = 0;
+				values[columns.indexOf("OnlineSecurity_Yes")] = 0;
+				values[columns.indexOf("OnlineSecurity_No internet service")] = 1;
+				values[columns.indexOf("OnlineBackup_No")] = 0;
+				values[columns.indexOf("OnlineBackup_Yes")] = 0;
+				values[columns.indexOf("OnlineBackup_No internet service")] = 1;
+				values[columns.indexOf("DeviceProtection_No")] = 0;
+				values[columns.indexOf("DeviceProtection_Yes")] = 0;
+				values[columns.indexOf("DeviceProtection_No internet service")] = 1;
+				values[columns.indexOf("TechSupport_No")] = 0;
+				values[columns.indexOf("TechSupport_Yes")] = 0;
+				values[columns.indexOf("TechSupport_No internet service")] = 1;
+				values[columns.indexOf("StreamingMovies_No")] = 0;
+				values[columns.indexOf("StreamingMovies_Yes")] = 0;
+				values[columns.indexOf("StreamingMovies_No internet service")] = 1;
+				values[columns.indexOf("StreamingTV_No")] = 0;
+				values[columns.indexOf("StreamingTV_Yes")] = 0;
+				values[columns.indexOf("StreamingTV_No internet service")] = 1;
+			}
+			if($("#PhoneService").prop("checked")){
+				values[columns.indexOf("MultipleLines_No")] = Number(!$("#MultipleLines").prop("checked"));
+				values[columns.indexOf("MultipleLines_Yes")] = Number($("#MultipleLines").prop("checked"));
+				values[columns.indexOf("MultipleLines_No phone service")] = 0;
+			}
+			else{
+				values[columns.indexOf("MultipleLines_No")] = 0;
+				values[columns.indexOf("MultipleLines_Yes")] = 0;
+				values[columns.indexOf("MultipleLines_No phone service")] = 1;
+			}
+			values[columns.indexOf("Contract_Month-to-month")] = Number($("#Contract").val() == "Month-to-month");
+			values[columns.indexOf("Contract_One year")] = Number($("#Contract").val() == "One year");
+			values[columns.indexOf("Contract_Two year")] = Number($("#Contract").val() == "Two year");
+			values[columns.indexOf("PaymentMethod_Bank transfer (automatic)")] = Number($("#PaymentMethod").val() == "Bank transfer (automatic)");
+			values[columns.indexOf("PaymentMethod_Electronic check")] = Number($("#PaymentMethod").val() == "Electronic check");
+			values[columns.indexOf("PaymentMethod_Credit card (automatic)")] = Number($("#PaymentMethod").val() == "Credit card (automatic)");
+			values[columns.indexOf("PaymentMethod_Mailed check")] = Number($("#PaymentMethod").val() == "Mailed check");
+			console.log("-------------------------");
+			for(var i = 0; i < values.length; i++){
+				console.log(columns[i] + ", " + values[i]);
+			}
+			loadModel();
+		});
+});
+
+</script>
+
+<body>
+	<input type="Submit" id="Submit"/>
+
+	<br>Gender
+	<select id="gender">
+		<option value="1">Female</option>
+		<option value="0">Male</option>
+	</select>
+
+	<br><label for="SeniorCitizen">Senior Citizen</label>
+	<input type="checkbox" name="SeniorCitizen" id="SeniorCitizen"/>
+
+	<br><label for="Partner">Partner</label>
+	<input type="checkbox" name="Partner" id="Partner"/>
+
+	<br><label for="Dependents">Dependents</label>
+	<input type="checkbox" name="Dependents" id="Dependents"/>
+
+	<br><label for="tenure">Tenure</label>
+	<input type="input" name="tenure" id="tenure" value = "10"/>
+
+	<br><label for="PhoneService">Phone Service</label>
+	<input type="checkbox" name="PhoneService" id="PhoneService"/>
+
+	<br><label for="MultipleLines">Multiple Lines</label>
+	<input type="checkbox" name="MultipleLines" id="MultipleLines"/>
+
+	<br><label for="PaperlessBilling">Paperless Billing</label>
+	<input type="checkbox" name="PaperlessBilling" id="PaperlessBilling"/>
+
+	<br><label for="MonthlyCharges">Monthly Charges</label>
+	<input type="input" name="MonthlyCharges" id="MonthlyCharges" value = "100"/>
+
+	<br><label for="TotalCharges">Total Charges</label>
+	<input type="input" name="TotalCharges" id="TotalCharges" value = "1000"/>
+
+	<br>Internet Service
+	<select id="InternetService">
+		<option value="No">No</option>
+		<option value="DSL">DSL</option>
+		<option value="Fiber optic">Fiber optic</option>
+	</select>
+	
+	<br><label for="OnlineSecurity">Online Security</label>
+	<input type="checkbox" name="OnlineSecurity" id="OnlineSecurity"/>
+	
+	<br><label for="OnlineBackup">Online Backup</label>
+	<input type="checkbox" name="OnlineBackup" id="OnlineBackup"/>
+
+	<br><label for="DeviceProtection">Device Protection</label>
+	<input type="checkbox" name="DeviceProtection" id="DeviceProtection"/>
+
+	<br><label for="TechSupport">Tech Support</label>
+	<input type="checkbox" name="TechSupport" id="TechSupport"/>
+		
+	<br><label for="StreamingTV">StreamingTV</label>
+	<input type="checkbox" name="StreamingTV" id="StreamingTV"/>
+
+	<br><label for="StreamingMovies">StreamingMovies</label>
+	<input type="checkbox" name="StreamingMovies" id="StreamingMovies"/>
+
+	<br>Contract
+	<select id="Contract">
+		<option value="Month-to-month">Month-to-Month</option>
+		<option value="One year">One year</option>
+		<option value="Two year">Two year</option>
+	</select>
+
+	<br>Payment Method
+	<select id="PaymentMethod">
+		<option value="Electronic check">Electronic check</option>
+		<option value="Credit card (automatic)">Credit card (automatic)</option>
+		<option value="Mailed check">Mailed check</option>
+		<option value="Bank transfer (automatic)">Bank transfer (automatic)</option>
+	</select>
+	
+
+
+</body>
+</html>
+
+
