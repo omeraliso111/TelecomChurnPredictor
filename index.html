@@ -1,6 +1,8 @@
 <html>
 <body></body>
+<link rel="stylesheet" type="text/css" href="bootstrap.min.css">
 <script src="jquery-3.4.1.min.js"></script>
+<script src="bootstrap.min.js"></script>
 <script src="tf.min.js"></script>
 <script>
 	var prediction = null;
@@ -11,10 +13,11 @@
 		var model = await tf.loadLayersModel("weights_js/model.json");
 		prediction = model.predict(tf.tensor([values]));
 		console.log("Prediction: " + prediction.dataSync()[0]);
+		
 		if(prediction.dataSync()[0] > 0.5){
-			console.log("Churn Likely");
+			alert("Churn Prediction: " + Math.round(prediction.dataSync()[0]*100) + "%\nChurn Likely");
 		}else{
-			console.log("Churn Unlikely");
+			alert("Churn Prediction: " + Math.round(prediction.dataSync()[0]*100) + "%\nChurn Unlikely");
 		}
 	}
 
@@ -125,81 +128,108 @@
 </script>
 
 <body>
-	<input type="Submit" id="Submit"/>
-
-	<br>Gender
-	<select id="gender">
-		<option value="1">Female</option>
-		<option value="0">Male</option>
-	</select>
-
-	<br><label for="SeniorCitizen">Senior Citizen</label>
-	<input type="checkbox" name="SeniorCitizen" id="SeniorCitizen"/>
-
-	<br><label for="Partner">Partner</label>
-	<input type="checkbox" name="Partner" id="Partner"/>
-
-	<br><label for="Dependents">Dependents</label>
-	<input type="checkbox" name="Dependents" id="Dependents"/>
-
-	<br><label for="tenure">Tenure</label>
-	<input type="input" name="tenure" id="tenure" value = "10"/>
-
-	<br><label for="PhoneService">Phone Service</label>
-	<input type="checkbox" name="PhoneService" id="PhoneService"/>
-
-	<br><label for="MultipleLines">Multiple Lines</label>
-	<input type="checkbox" name="MultipleLines" id="MultipleLines"/>
-
-	<br><label for="PaperlessBilling">Paperless Billing</label>
-	<input type="checkbox" name="PaperlessBilling" id="PaperlessBilling"/>
-
-	<br><label for="MonthlyCharges">Monthly Charges</label>
-	<input type="input" name="MonthlyCharges" id="MonthlyCharges" value = "100"/>
-
-	<br><label for="TotalCharges">Total Charges</label>
-	<input type="input" name="TotalCharges" id="TotalCharges" value = "1000"/>
-
-	<br>Internet Service
-	<select id="InternetService">
-		<option value="No">No</option>
-		<option value="DSL">DSL</option>
-		<option value="Fiber optic">Fiber optic</option>
-	</select>
-	
-	<br><label for="OnlineSecurity">Online Security</label>
-	<input type="checkbox" name="OnlineSecurity" id="OnlineSecurity"/>
-	
-	<br><label for="OnlineBackup">Online Backup</label>
-	<input type="checkbox" name="OnlineBackup" id="OnlineBackup"/>
-
-	<br><label for="DeviceProtection">Device Protection</label>
-	<input type="checkbox" name="DeviceProtection" id="DeviceProtection"/>
-
-	<br><label for="TechSupport">Tech Support</label>
-	<input type="checkbox" name="TechSupport" id="TechSupport"/>
-		
-	<br><label for="StreamingTV">StreamingTV</label>
-	<input type="checkbox" name="StreamingTV" id="StreamingTV"/>
-
-	<br><label for="StreamingMovies">StreamingMovies</label>
-	<input type="checkbox" name="StreamingMovies" id="StreamingMovies"/>
-
-	<br>Contract
-	<select id="Contract">
-		<option value="Month-to-month">Month-to-Month</option>
-		<option value="One year">One year</option>
-		<option value="Two year">Two year</option>
-	</select>
-
-	<br>Payment Method
-	<select id="PaymentMethod">
-		<option value="Electronic check">Electronic check</option>
-		<option value="Credit card (automatic)">Credit card (automatic)</option>
-		<option value="Mailed check">Mailed check</option>
-		<option value="Bank transfer (automatic)">Bank transfer (automatic)</option>
-	</select>
-	
+	<div class="container-fluid">
+		<div class="col col-lg-6 offset-lg-1">
+			<h1>Telco Churn Predictor</h1>
+			<p class="text-justify">This is an demo put together to attempt to train a model using <a href="https://www.tensorflow.org/">Tensorflow 2.0</a>, transform it into a <a href="https://www.tensorflow.org/js">TensorflowJS</a> model, and serve it in a website. To try it out, enter a customer's information below and the model will predict whether that customer will drop that service. The data is based on the <a href="https://www.kaggle.com/blastchar/telco-customer-churn">Telco Kaggle Dataset</a>.</p>
+		</div>
+		<div class="col col-lg-3 offset-lg-1">
+			<div class="form-group">
+				<label class="" for="gender">Gender</label>
+				<select class="form-control" id="gender">
+					<option value="1" selected>Female</option>
+					<option value="0">Male</option>
+				</select>
+			</div>
+			<div class="form-check">
+					<input class="form-check-input" type="checkbox" name="SeniorCitizen" id="SeniorCitizen">
+					<label class="form-check-label" for="SeniorCitizen">Senior Citizen</label>
+			</div>
+			<div class="form-check">
+					<input class="form-check-input" type="checkbox" name="Partner" id="Partner"/>
+					<label class="form-check-label" for="Partner">Partner</label>
+			</div>
+			<div class="form-check">
+					<input class="form-check-input" type="checkbox" name="Dependents" id="Dependents"/>
+					<label class="form-check-label" for="Dependents">Dependents</label>
+			</div>
+			<div class="form-check">
+					<input class="form-check-input" type="checkbox" name="PaperlessBilling" id="PaperlessBilling"/>
+					<label class="form-check-label" for="PaperlessBilling">Paperless Billing</label>
+			</div>
+			<div class="form-check">
+					<input class="form-check-input" type="checkbox" name="PhoneService" id="PhoneService"/>
+					<label class="form-check-label" for="PhoneService">Phone Service</label>
+			</div>
+			<div class="form-check">
+					<input class="form-check-input" type="checkbox" name="MultipleLines" id="MultipleLines"/>
+					<label class="form-check-label" for="MultipleLines">Multiple Lines</label>
+			</div>
+			<div class="form-group">
+					<label for="InternetService">Internet Service</label>
+					<select class="form-control" id="InternetService">
+						<option value="No" selected>No</option>
+						<option value="DSL">DSL</option>
+						<option value="Fiber optic">Fiber optic</option>
+					</select>
+			</div>
+			<div class="form-check">
+					<input class="form-check-input" type="checkbox" name="OnlineSecurity" id="OnlineSecurity"/>
+					<label class="form-check-label" for="OnlineSecurity">Online Security</label>
+			</div>
+			<div class="form-check">
+					<input class="form-check-input" type="checkbox" name="OnlineBackup" id="OnlineBackup"/>
+					<label class="form-check-label" for="OnlineBackup">Online Backup</label>
+			</div>
+			<div class="form-check">
+					<input class="form-check-input" type="checkbox" name="DeviceProtection" id="DeviceProtection"/>
+					<label class="form-check-label" for="DeviceProtection">Device Protection</label>
+			</div>
+			<div class="form-check">
+					<input class="form-check-input" type="checkbox" name="TechSupport" id="TechSupport"/>
+					<label class="form-check-label" for="TechSupport">Tech Support</label>
+			</div>
+			<div class="form-check">
+					<input class="form-check-input" type="checkbox" name="StreamingTV" id="StreamingTV"/>
+					<label class="form-check-label" for="StreamingTV">StreamingTV</label>
+			</div>
+			<div class="form-check">
+					<input class="form-check-input" type="checkbox" name="StreamingMovies" id="StreamingMovies"/>
+					<label for="StreamingMovies">StreamingMovies</label>
+			</div>
+			<div class="form-group">
+					<label for="Contract">Contract</label>
+					<select class="form-control" id="Contract">
+						<option value="Month-to-month">Month-to-Month</option>
+						<option value="One year">One year</option>
+						<option value="Two year">Two year</option>
+					</select>
+			</div>
+			<div class="form-group">
+					<label for="PaymentMethod">Payment Method</label>
+					<select class="form-control" id="PaymentMethod">
+						<option value="Electronic check">Electronic check</option>
+						<option value="Credit card (automatic)">Credit card (automatic)</option>
+						<option value="Mailed check">Mailed check</option>
+						<option value="Bank transfer (automatic)">Bank transfer (automatic)</option>
+					</select>
+			</div>
+			<div class="form-group">
+					<label class="" for="tenure">Months with Telecom</label>
+					<input class="form-control" type="text" name="tenure" id="tenure" value = "10"/>
+			</div>
+			<div class="form-group">
+					<label for="MonthlyCharges">Monthly Bill</label>
+					<input class="form-control" type="text" name="MonthlyCharges" id="MonthlyCharges" value = "100"/>
+			</div>
+			<div class="form-group">
+					<label for="TotalCharges">Total Lifetime Payment</label>
+					<input class="form-control" type="input" name="TotalCharges" id="TotalCharges" value = "1000"/>
+			</div>
+			 <button type="button" class="btn btn-primary btn-lg" id="Submit">Submit</button>
+		</div>
+	</div>	
+	<br>
 
 
 </body>
